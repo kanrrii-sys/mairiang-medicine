@@ -1,1 +1,208 @@
-# mairiang-medicine
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบขอรับยาสามัญ | โรงเรียนไม้เรียงประชาสรรค์</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt','Sarabun',Arial,sans-serif; }
+    body { background:#f4f8fb; color:#1f2937; }
+    header { background:linear-gradient(135deg, #0b3d91 0%, #0b3d91 50%, #facc15 50%, #facc15 100%); color:#fff; padding:26px 18px 70px; border-bottom-left-radius:36px; border-bottom-right-radius:36px; }
+    .topbar,.hero,main { max-width:1180px; margin:auto; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .school-brand { display:flex; align-items:center; gap:12px; }
+    .logo { width:58px; height:58px; border-radius:50%; background:white; color:#0b3d91; display:grid; place-items:center; font-weight:900; font-size:18px; box-shadow:0 8px 24px rgba(0,0,0,.16); }
+    h1 { font-size:22px; line-height:1.2; }
+    .school-brand p { font-size:13px; opacity:.9; }
+    .nav-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .nav-btn { border:1px solid rgba(255,255,255,.45); background:rgba(255,255,255,.25); color:#fff; padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:700; backdrop-filter: blur(6px); }
+    .nav-btn.active { background:#fff; color:#0b3d91; }
+    .hero { margin-top:34px; display:grid; grid-template-columns:1.4fr .8fr; gap:24px; align-items:center; }
+    .hero h2 { font-size:clamp(30px,5vw,54px); line-height:1.08; margin-bottom:16px; }
+    .hero p { font-size:17px; line-height:1.7; max-width:720px; opacity:.95; color:#ffffff; text-shadow: 0 1px 3px rgba(0,0,0,.18); }
+    .hero-card,.panel { background:#fff; color:#1f2937; border-radius:26px; padding:22px; box-shadow:0 20px 50px rgba(0,0,0,.14); }
+    .hero-card { border: 3px solid #facc15; }
+    .hero-card h3,.section-title h2,.cart h2 { color:#0b3d91; }
+    .hero-card ul { padding-left:20px; line-height:1.8; font-size:14px; }
+    main { margin-top:-42px; padding:0 18px 40px; display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start; }
+    .panel { box-shadow:0 12px 32px rgba(15,23,42,.08); }
+    .section-title { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+    .search-box,input,select,textarea { width:100%; padding:11px 12px; border:1px solid #d1d5db; border-radius:14px; outline:none; font-size:14px; margin-top:6px; }
+    .search-box { width:260px; max-width:100%; border-radius:999px; margin-top:0; }
+    .categories { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+    .category-btn { border:none; padding:10px 15px; border-radius:999px; background:#fef3c7; color:#0b3d91; cursor:pointer; font-weight:700; }
+    .category-btn.active { background:#0b3d91; color:white; }
+    .items-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .item-card { border:1px solid #e5e7eb; border-radius:22px; padding:16px; display:grid; grid-template-columns:72px 1fr; gap:14px; transition:.2s ease; }
+    .item-card:hover { transform:translateY(-3px); box-shadow:0 12px 24px rgba(15,23,42,.08); }
+    .item-icon { width:72px; height:72px; border-radius:20px; display:grid; place-items:center; font-size:34px; background:#dbeafe; }
+    .item-card h3 { font-size:18px; margin-bottom:4px; }
+    .item-card p { font-size:13px; color:#6b7280; line-height:1.55; min-height:40px; }
+    .tag-row { display:flex; justify-content:space-between; align-items:center; margin-top:12px; gap:8px; }
+    .tag { font-size:12px; background:#fef3c7; color:#0b3d91; padding:5px 9px; border-radius:999px; }
+    .add-btn,.submit-btn,.admin-action { border:none; background:#1d4ed8; color:white; padding:9px 12px; border-radius:12px; cursor:pointer; font-weight:800; }
+    .cart { position:sticky; top:18px; }
+    .cart-item { display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid #e5e7eb; padding:12px 0; font-size:14px; }
+    .qty-control { display:flex; align-items:center; gap:7px; }
+    .qty-control button { width:26px; height:26px; border:none; border-radius:8px; background:#fef3c7; color:#0b3d91; cursor:pointer; font-weight:900; }
+    .empty-cart { color:#6b7280; font-size:14px; padding:16px 0; line-height:1.6; }
+    form { margin-top:18px; display:grid; gap:12px; }
+    label { font-size:13px; color:#374151; font-weight:800; }
+    textarea { min-height:76px; resize:vertical; }
+    .submit-btn { background:linear-gradient(135deg,#0b3d91,#1d4ed8); padding:14px; font-size:16px; margin-top:4px; }
+    .warning { margin-top:14px; padding:13px; border-radius:18px; background:#fff7ed; color:#9a3412; font-size:13px; line-height:1.6; border:1px solid #fed7aa; }
+    .toast { position:fixed; right:20px; bottom:20px; background:#0b3d91; color:white; padding:14px 18px; border-radius:16px; box-shadow:0 15px 30px rgba(0,0,0,.18); opacity:0; pointer-events:none; transform:translateY(12px); transition:.25s ease; }
+    .toast.show { opacity:1; transform:translateY(0); }
+    footer { text-align:center; color:#6b7280; padding:20px; font-size:13px; }
+    .hidden { display:none; }
+    .admin-main { grid-template-columns:1fr; }
+    .admin-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+    .stat-card { background:#dbeafe; border:1px solid #bfdbfe; border-radius:20px; padding:16px; }
+    .stat-card strong { display:block; font-size:28px; color:#0b3d91; margin-top:4px; }
+    table { width:100%; border-collapse:collapse; overflow:hidden; border-radius:18px; font-size:14px; }
+    th,td { padding:13px; border-bottom:1px solid #e5e7eb; text-align:left; vertical-align:top; }
+    th { background:#0b3d91; color:#fff; }
+    .status { display:inline-block; padding:5px 9px; border-radius:999px; font-size:12px; font-weight:800; }
+    .pending { background:#fef3c7; color:#92400e; }
+    .approved { background:#fef3c7; color:#166534; }
+    .done { background:#dbeafe; color:#1e40af; }
+    .reject { background:#fee2e2; color:#991b1b; }
+    .admin-action.secondary { background:#2563eb; }
+    .admin-action.danger { background:#dc2626; }
+    .admin-action.gray { background:#6b7280; }
+    .admin-toolbar { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .pin-modal { position:fixed; inset:0; background:rgba(15,23,42,.62); display:grid; place-items:center; padding:18px; z-index:50; }
+    .pin-modal.hidden { display:none !important; }
+    .pin-card { width:min(420px,100%); background:white; color:#1f2937; border-radius:26px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,.28); }
+    .pin-card h2 { color:#0b3d91; margin-bottom:8px; }
+    .pin-card p { color:#6b7280; font-size:14px; line-height:1.6; margin-bottom:14px; }
+    .pin-actions { display:flex; gap:10px; margin-top:12px; }
+    .pin-actions button { flex:1; }
+    .pin-error { color:#dc2626; font-size:13px; margin-top:10px; display:none; font-weight:700; }
+    .success-modal { position:fixed; inset:0; background:rgba(15,23,42,.62); display:grid; place-items:center; padding:18px; z-index:60; }
+    .success-modal.hidden { display:none !important; }
+    .success-card { width:min(430px,100%); background:white; text-align:center; border-radius:30px; padding:34px 24px; box-shadow:0 24px 60px rgba(0,0,0,.28); }
+    .success-check { width:92px; height:92px; border-radius:50%; background:#fef3c7; color:#ca8a04; display:grid; place-items:center; margin:0 auto 18px; font-size:54px; font-weight:900; }
+    .success-card h2 { color:#0b3d91; font-size:30px; margin-bottom:8px; }
+    .success-card p { color:#6b7280; line-height:1.7; margin-bottom:18px; }
+    @media (max-width:900px){ .hero,main{grid-template-columns:1fr;} main{margin-top:-34px;} .items-grid,.admin-stats{grid-template-columns:1fr;} .cart{position:static;} .topbar{align-items:flex-start; flex-direction:column;} table{font-size:12px;} th,td{padding:9px;} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="school-brand">
+        <div class="logo">ม.ป.</div>
+        <div><h1>โรงเรียนไม้เรียงประชาสรรค์</h1><p>ระบบขอรับยาสามัญและของใช้จำเป็นภายในโรงเรียน</p></div>
+      </div>
+      <div class="nav-actions">
+        <button class="nav-btn active" id="studentBtn" onclick="showPage('student')">หน้าเบิกยา</button>
+        <button class="nav-btn" id="adminBtn" onclick="showPage('admin')">หลังบ้านแอดมิน</button>
+      </div>
+    </div>
+    <section class="hero" id="studentHero">
+      <div><h2>ระบบขอรับยาสามัญภายในโรงเรียน</h2><p>นักเรียนสามารถเลือกรายการยาสามัญหรือของใช้จำเป็น ส่งคำขอ และรอเจ้าหน้าที่ห้องพยาบาลตรวจสอบก่อนรับของ เพื่อความปลอดภัยและการใช้ยาอย่างถูกต้อง</p></div>
+      <div class="hero-card"><h3>ขั้นตอนการใช้งาน</h3><ul><li>เลือกรายการที่ต้องการ</li><li>กรอกชื่อ ชั้น/ห้อง และอาการเบื้องต้น</li><li>ส่งคำขอให้เจ้าหน้าที่ตรวจสอบ</li><li>รับยา/ของใช้ที่ห้องพยาบาล</li></ul></div>
+    </section>
+    <section class="hero hidden" id="adminHero">
+      <div><h2>ระบบหลังบ้านแอดมิน<br>จัดการคำขอรับยา</h2><p>สำหรับเจ้าหน้าที่ห้องพยาบาลตรวจสอบคำสั่งขอรับยา เปลี่ยนสถานะคำขอ และติดตามจำนวนรายการที่รอดำเนินการ</p></div>
+      <div class="hero-card"><h3>สถานะคำขอ</h3><ul><li>รอตรวจสอบ</li><li>อนุมัติให้รับ</li><li>รับเรียบร้อย</li><li>ไม่อนุมัติ</li></ul></div>
+    </section>
+  </header>
+
+  <main id="studentPage">
+    <section class="panel">
+      <div class="section-title"><h2>รายการที่ให้บริการ</h2><input class="search-box" id="searchInput" type="text" placeholder="ค้นหา เช่น พารา ผ้าอนามัย"></div>
+      <div class="categories"><button class="category-btn active" onclick="filterCategory('ทั้งหมด',this)">ทั้งหมด</button><button class="category-btn" onclick="filterCategory('ยา',this)">ยา</button><button class="category-btn" onclick="filterCategory('ของใช้จำเป็น',this)">ของใช้จำเป็น</button><button class="category-btn" onclick="filterCategory('ปฐมพยาบาล',this)">ปฐมพยาบาล</button></div>
+      <div class="items-grid" id="itemsGrid"></div>
+    </section>
+    <aside class="panel cart">
+      <h2>ตะกร้าคำขอ</h2><div id="cartList" class="empty-cart">ยังไม่มีรายการ กรุณาเลือกรายการที่ต้องการขอรับ</div>
+      <form id="requestForm">
+        <div><label>ชื่อ-นามสกุล</label><input type="text" id="studentName" placeholder="กรอกชื่อผู้ขอรับ" required></div>
+        <div><label>ชั้น/ห้อง</label><input type="text" id="classRoom" placeholder="เช่น ม.3/2" required></div>
+        <div><label>ประเภทผู้ขอ</label><select id="userType" required><option value="">เลือกประเภท</option><option>นักเรียน</option><option>ครู/บุคลากร</option></select></div>
+        <div><label>ช่องทางติดต่อ</label><input type="text" id="contactInfo" placeholder="เช่น เบอร์โทร หรืออีเมล" required></div>
+        <div id="padSizeSection" class="hidden"><label>ขนาดผ้าอนามัย</label><select id="padSize"><option value="">เลือกขนาด</option><option>ขนาดกลาง (24–26 ซม.)</option><option>ขนาดยาว (29–32 ซม.)</option><option>กลางคืน / Overnight</option></select></div>
+        <div><label>อาการหรือเหตุผลในการขอรับ</label><textarea id="reason" placeholder="เช่น ปวดศีรษะ ปวดท้อง มีประจำเดือน เป็นภูมิแพ้" required></textarea></div>
+        <button class="submit-btn" type="submit">ส่งคำขอรับยา</button>
+      </form>
+      <div class="warning"><strong>คำเตือน:</strong> รายการยาเป็นเพียงการส่งคำขอเบื้องต้น ต้องได้รับการตรวจสอบจากครู/เจ้าหน้าที่ห้องพยาบาลก่อนทุกครั้ง หากมีอาการรุนแรงควรแจ้งครูทันที</div>
+    </aside>
+  </main>
+
+  <main id="adminPage" class="admin-main hidden">
+    <section class="panel">
+      <div class="section-title"><h2>หลังบ้านแอดมิน: รายการคำขอรับยา</h2><input class="search-box" id="adminSearch" type="text" placeholder="ค้นหาชื่อ / ห้อง / รายการ"></div>
+      <div class="admin-stats">
+        <div class="stat-card">คำขอทั้งหมด <strong id="totalCount">0</strong></div>
+        <div class="stat-card">รอตรวจสอบ <strong id="pendingCount">0</strong></div>
+        <div class="stat-card">อนุมัติแล้ว <strong id="approvedCount">0</strong></div>
+        <div class="stat-card">รับเรียบร้อย <strong id="doneCount">0</strong></div>
+      </div>
+      <div class="admin-toolbar">
+        <button class="admin-action gray" onclick="loadSampleOrders()">เพิ่มข้อมูลตัวอย่าง</button>
+        <button class="admin-action danger" onclick="clearOrders()">ล้างคำขอทั้งหมด</button>
+      </div>
+      <div style="overflow-x:auto;"><table><thead><tr><th>เวลา</th><th>ผู้ขอ</th><th>ติดต่อ</th><th>รายการ</th><th>เหตุผล</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+    </section>
+  </main>
+
+  <footer>© โรงเรียนไม้เรียงประชาสรรค์ | ระบบตัวอย่างสำหรับใช้งานภายในโรงเรียน</footer>
+  <div class="toast" id="toast">เพิ่มรายการในตะกร้าแล้ว</div>
+
+  <div class="success-modal hidden" id="successModal">
+    <div class="success-card">
+      <div class="success-check">✓</div>
+      <h2>คำขอเสร็จสิ้น</h2>
+      <p>ระบบได้รับคำขอเรียบร้อยแล้ว กรุณารอแอดมินตรวจสอบ และจะติดต่อกลับไปอีกครั้ง</p>
+      <button class="submit-btn" onclick="closeSuccessModal()">กลับไปหน้าเบิกยา</button>
+    </div>
+  </div>
+
+  <div class="pin-modal hidden" id="pinModal">
+    <div class="pin-card">
+      <h2>เข้าสู่หลังบ้านแอดมิน</h2>
+      <p>กรุณาใส่ PIN สำหรับเจ้าหน้าที่ เพื่อดูและจัดการคำขอรับยา</p>
+      <label>PIN</label>
+      <input type="password" id="pinInput" placeholder="กรอก PIN 4 หลัก" maxlength="4">
+      <div class="pin-error" id="pinError">PIN ไม่ถูกต้อง กรุณาลองใหม่</div>
+      <div class="pin-actions">
+        <button class="admin-action gray" onclick="closePinModal()">ยกเลิก</button>
+        <button class="admin-action" onclick="checkPin()">เข้าสู่ระบบ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const items=[{name:'ผ้าอนามัย',category:'ของใช้จำเป็น',icon:'🌸',desc:'สำหรับนักเรียนหญิงที่มีความจำเป็นเร่งด่วนระหว่างวัน',tag:'รับที่ห้องพยาบาล'},{name:'ยาพาราเซตามอล',category:'ยา',icon:'💊',desc:'ใช้บรรเทาอาการปวดหรือมีไข้ ต้องให้เจ้าหน้าที่พิจารณาก่อนจ่าย',tag:'ต้องตรวจสอบอาการ'},{name:'ยาแก้แพ้',category:'ยา',icon:'🤧',desc:'สำหรับอาการแพ้ คัดจมูก หรือผื่นคันบางกรณี ต้องแจ้งประวัติแพ้ยา',tag:'แจ้งประวัติแพ้ยา'},{name:'ยาธาตุน้ำขาว',category:'ยา',icon:'🧴',desc:'สำหรับอาการแน่นท้อง ท้องอืด หรืออาหารไม่ย่อยเบื้องต้น',tag:'อาการทางท้อง'},{name:'พลาสเตอร์ปิดแผล',category:'ปฐมพยาบาล',icon:'🩹',desc:'สำหรับแผลเล็ก รอยถลอก หรือบาดแผลที่ไม่รุนแรง',tag:'แผลเล็ก'},{name:'สำลี/ผ้าก๊อซ',category:'ปฐมพยาบาล',icon:'🏥',desc:'สำหรับทำแผลเบื้องต้น โดยควรให้เจ้าหน้าที่ช่วยดูแล',tag:'ทำแผล'}];
+    let selectedCategory='ทั้งหมด'; let cart=[]; let orders=JSON.parse(localStorage.getItem('schoolMedicineOrders')||'[]'); let adminUnlocked=false;
+    function showPage(page){
+      if(page==='admin' && !adminUnlocked){openPinModal(); return;}
+      document.getElementById('studentPage').classList.toggle('hidden',page!=='student');document.getElementById('adminPage').classList.toggle('hidden',page!=='admin');document.getElementById('studentHero').classList.toggle('hidden',page!=='student');document.getElementById('adminHero').classList.toggle('hidden',page!=='admin');document.getElementById('studentBtn').classList.toggle('active',page==='student');document.getElementById('adminBtn').classList.toggle('active',page==='admin'); if(page==='admin') renderOrders();}
+    function openPinModal(){document.getElementById('pinModal').classList.remove('hidden');document.getElementById('pinInput').value='';document.getElementById('pinError').style.display='none';setTimeout(()=>document.getElementById('pinInput').focus(),80);}
+    function closePinModal(){document.getElementById('pinModal').classList.add('hidden');showPage('student');}
+    function checkPin(){const pin=document.getElementById('pinInput').value;if(pin==='6666'){adminUnlocked=true;document.getElementById('pinModal').classList.add('hidden');showPage('admin');}else{document.getElementById('pinError').style.display='block';document.getElementById('pinInput').value='';document.getElementById('pinInput').focus();}}
+    document.addEventListener('keydown',e=>{if(e.key==='Enter' && !document.getElementById('pinModal').classList.contains('hidden')) checkPin();});
+    function renderItems(){const grid=document.getElementById('itemsGrid');const keyword=document.getElementById('searchInput').value.toLowerCase();const filtered=items.filter(i=>(selectedCategory==='ทั้งหมด'||i.category===selectedCategory)&&(i.name.toLowerCase().includes(keyword)||i.desc.toLowerCase().includes(keyword)));grid.innerHTML=filtered.map(i=>`<article class="item-card"><div class="item-icon">${i.icon}</div><div><h3>${i.name}</h3><p>${i.desc}</p><div class="tag-row"><span class="tag">${i.tag}</span><button class="add-btn" onclick="addToCart('${i.name}')">เพิ่ม</button></div></div></article>`).join('')||'<p class="empty-cart">ไม่พบรายการที่ค้นหา</p>';}
+    function filterCategory(c,b){selectedCategory=c;document.querySelectorAll('.category-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderItems();}
+    function addToCart(name){const f=cart.find(i=>i.name===name); f?f.qty++:cart.push({name,qty:1}); renderCart(); togglePadSize(); showToast('เพิ่มรายการในตะกร้าแล้ว');}
+    function updateQty(name,amt){const f=cart.find(i=>i.name===name); if(!f)return; f.qty+=amt; if(f.qty<=0)cart=cart.filter(i=>i.name!==name); renderCart();}
+    function renderCart(){const el=document.getElementById('cartList'); if(!cart.length){el.className='empty-cart';el.innerHTML='ยังไม่มีรายการ กรุณาเลือกรายการที่ต้องการขอรับ'; togglePadSize(); return;} el.className=''; el.innerHTML=cart.map(i=>`<div class="cart-item"><span>${i.name}</span><div class="qty-control"><button type="button" onclick="updateQty('${i.name}',-1)">−</button><strong>${i.qty}</strong><button type="button" onclick="updateQty('${i.name}',1)">+</button></div></div>`).join(''); togglePadSize();}
+    function togglePadSize(){const hasPad=cart.some(i=>i.name==='ผ้าอนามัย'); document.getElementById('padSizeSection').classList.toggle('hidden',!hasPad);}
+    function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+    function saveOrders(){localStorage.setItem('schoolMedicineOrders',JSON.stringify(orders));}
+    document.getElementById('searchInput').addEventListener('input',renderItems); document.getElementById('adminSearch').addEventListener('input',renderOrders);
+    document.getElementById('requestForm').addEventListener('submit',e=>{e.preventDefault(); if(!cart.length){alert('กรุณาเลือกรายการก่อนส่งคำขอ');return;} const hasPad=cart.some(i=>i.name==='ผ้าอนามัย'); if(hasPad && !padSize.value){alert('กรุณาระบุขนาดผ้าอนามัย'); return;} const itemText=cart.map(i=>{if(i.name==='ผ้าอนามัย'){return `${i.name} (${padSize.value}) x ${i.qty}`;} return `${i.name} x ${i.qty}`;}).join(', '); const order={id:Date.now(),time:new Date().toLocaleString('th-TH'),name:studentName.value,room:classRoom.value,type:userType.value,contact:contactInfo.value,items:itemText,reason:reason.value,status:'รอตรวจสอบ'}; orders.unshift(order); saveOrders(); cart=[]; renderCart(); e.target.reset(); document.getElementById('successModal').classList.remove('hidden');});
+    function closeSuccessModal(){document.getElementById('successModal').classList.add('hidden');showPage('student');}
+    function statusClass(s){return s==='รอตรวจสอบ'?'pending':s==='อนุมัติให้รับ'?'approved':s==='รับเรียบร้อย'?'done':'reject';}
+    function renderOrders(){const q=(document.getElementById('adminSearch')?.value||'').toLowerCase(); const rows=orders.filter(o=>(o.name+o.room+o.items+o.reason+o.status).toLowerCase().includes(q)); document.getElementById('ordersTable').innerHTML=rows.map(o=>`<tr><td>${o.time}</td><td><strong>${o.name}</strong><br>${o.type} | ${o.room}</td><td>${o.contact || '-'}</td><td>${o.items}</td><td>${o.reason}</td><td><span class="status ${statusClass(o.status)}">${o.status}</span></td><td><button class="admin-action" onclick="setStatus(${o.id},'อนุมัติให้รับ')">อนุมัติ</button> <button class="admin-action secondary" onclick="setStatus(${o.id},'รับเรียบร้อย')">รับแล้ว</button> <button class="admin-action gray" onclick="setStatus(${o.id},'ไม่อนุมัติ')">ไม่อนุมัติ</button> <button class="admin-action danger" onclick="deleteOrder(${o.id})">ลบ</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty-cart">ยังไม่มีคำขอรับยา</td></tr>'; updateStats();}
+    function updateStats(){document.getElementById('totalCount').textContent=orders.length;document.getElementById('pendingCount').textContent=orders.filter(o=>o.status==='รอตรวจสอบ').length;document.getElementById('approvedCount').textContent=orders.filter(o=>o.status==='อนุมัติให้รับ').length;document.getElementById('doneCount').textContent=orders.filter(o=>o.status==='รับเรียบร้อย').length;}
+    function setStatus(id,status){orders=orders.map(o=>o.id===id?{...o,status}:o);saveOrders();renderOrders();}
+    function deleteOrder(id){if(confirm('ต้องการลบคำขอนี้ใช่หรือไม่?')){orders=orders.filter(o=>o.id!==id);saveOrders();renderOrders();}}
+    function clearOrders(){if(confirm('ต้องการล้างคำขอทั้งหมดใช่หรือไม่?')){orders=[];saveOrders();renderOrders();}}
+    function loadSampleOrders(){orders.unshift({id:Date.now()+1,time:new Date().toLocaleString('th-TH'),name:'นักเรียนตัวอย่าง 1',room:'ม.3/2',type:'นักเรียน',contact:'081-234-5678',items:'ผ้าอนามัย x 1',reason:'มีประจำเดือนระหว่างเรียน',status:'รอตรวจสอบ'},{id:Date.now()+2,time:new Date().toLocaleString('th-TH'),name:'นักเรียนตัวอย่าง 2',room:'ม.5/1',type:'นักเรียน',contact:'student@example.com',items:'พลาสเตอร์ปิดแผล x 1',reason:'หกล้ม มีแผลถลอก',status:'อนุมัติให้รับ'});saveOrders();renderOrders();}
+    renderItems(); renderCart(); renderOrders();
+  </script>
+</body>
+</html>
