@@ -174,35 +174,268 @@
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <script>
-    const items=[{name:'ผ้าอนามัย',category:'ของใช้จำเป็น',icon:'🌸',desc:'สำหรับนักเรียนหญิงที่มีความจำเป็นเร่งด่วนระหว่างวัน',tag:'รับที่ห้องพยาบาล'},{name:'ยาพาราเซตามอล',category:'ยา',icon:'💊',desc:'ใช้บรรเทาอาการปวดหรือมีไข้ ต้องให้เจ้าหน้าที่พิจารณาก่อนจ่าย',tag:'ต้องตรวจสอบอาการ'},{name:'ยาแก้แพ้',category:'ยา',icon:'🤧',desc:'สำหรับอาการแพ้ คัดจมูก หรือผื่นคันบางกรณี ต้องแจ้งประวัติแพ้ยา',tag:'แจ้งประวัติแพ้ยา'},{name:'ยาธาตุน้ำขาว',category:'ยา',icon:'🧴',desc:'สำหรับอาการแน่นท้อง ท้องอืด หรืออาหารไม่ย่อยเบื้องต้น',tag:'อาการทางท้อง'},{name:'พลาสเตอร์ปิดแผล',category:'ปฐมพยาบาล',icon:'🩹',desc:'สำหรับแผลเล็ก รอยถลอก หรือบาดแผลที่ไม่รุนแรง',tag:'แผลเล็ก'},{name:'สำลี/ผ้าก๊อซ',category:'ปฐมพยาบาล',icon:'🏥',desc:'สำหรับทำแผลเบื้องต้น โดยควรให้เจ้าหน้าที่ช่วยดูแล',tag:'ทำแผล'}];
-    let selectedCategory='ทั้งหมด'; let cart=[]; let orders=JSON.parse(localStorage.getItem('schoolMedicineOrders')||'[]'); let adminUnlocked=false;
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWV3QSHFGvD0qPqe-qgDvyPJqBo1bJDVM",
+      authDomain: "planning-with-ai-42dd2.firebaseapp.com",
+      databaseURL: "https://planning-with-ai-42dd2-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "planning-with-ai-42dd2",
+      storageBucket: "planning-with-ai-42dd2.firebasestorage.app",
+      messagingSenderId: "1044229579571",
+      appId: "1:1044229579571:web:bdb7b47615a63259df9446"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const ordersRef = database.ref('orders');
+
+    const items = [
+      {name:'ผ้าอนามัย',category:'ของใช้จำเป็น',icon:'🌸',desc:'สำหรับนักเรียนหญิงที่มีความจำเป็นเร่งด่วนระหว่างวัน',tag:'รับที่ห้องพยาบาล'},
+      {name:'ยาพาราเซตามอล',category:'ยา',icon:'💊',desc:'ใช้บรรเทาอาการปวดหรือมีไข้ ต้องให้เจ้าหน้าที่พิจารณาก่อนจ่าย',tag:'ต้องตรวจสอบอาการ'},
+      {name:'ยาแก้แพ้',category:'ยา',icon:'🤧',desc:'สำหรับอาการแพ้ คัดจมูก หรือผื่นคันบางกรณี ต้องแจ้งประวัติแพ้ยา',tag:'แจ้งประวัติแพ้ยา'},
+      {name:'ยาธาตุน้ำขาว',category:'ยา',icon:'🧴',desc:'สำหรับอาการแน่นท้อง ท้องอืด หรืออาหารไม่ย่อยเบื้องต้น',tag:'อาการทางท้อง'},
+      {name:'พลาสเตอร์ปิดแผล',category:'ปฐมพยาบาล',icon:'🩹',desc:'สำหรับแผลเล็ก รอยถลอก หรือบาดแผลที่ไม่รุนแรง',tag:'แผลเล็ก'},
+      {name:'สำลี/ผ้าก๊อซ',category:'ปฐมพยาบาล',icon:'🏥',desc:'สำหรับทำแผลเบื้องต้น โดยควรให้เจ้าหน้าที่ช่วยดูแล',tag:'ทำแผล'}
+    ];
+
+    let selectedCategory = 'ทั้งหมด';
+    let cart = [];
+    let orders = [];
+    let adminUnlocked = false;
+
     function showPage(page){
-      if(page==='admin' && !adminUnlocked){openPinModal(); return;}
-      document.getElementById('studentPage').classList.toggle('hidden',page!=='student');document.getElementById('adminPage').classList.toggle('hidden',page!=='admin');document.getElementById('studentHero').classList.toggle('hidden',page!=='student');document.getElementById('adminHero').classList.toggle('hidden',page!=='admin');document.getElementById('studentBtn').classList.toggle('active',page==='student');document.getElementById('adminBtn').classList.toggle('active',page==='admin'); if(page==='admin') renderOrders();}
-    function openPinModal(){document.getElementById('pinModal').classList.remove('hidden');document.getElementById('pinInput').value='';document.getElementById('pinError').style.display='none';setTimeout(()=>document.getElementById('pinInput').focus(),80);}
-    function closePinModal(){document.getElementById('pinModal').classList.add('hidden');showPage('student');}
-    function checkPin(){const pin=document.getElementById('pinInput').value;if(pin==='6666'){adminUnlocked=true;document.getElementById('pinModal').classList.add('hidden');showPage('admin');}else{document.getElementById('pinError').style.display='block';document.getElementById('pinInput').value='';document.getElementById('pinInput').focus();}}
-    document.addEventListener('keydown',e=>{if(e.key==='Enter' && !document.getElementById('pinModal').classList.contains('hidden')) checkPin();});
-    function renderItems(){const grid=document.getElementById('itemsGrid');const keyword=document.getElementById('searchInput').value.toLowerCase();const filtered=items.filter(i=>(selectedCategory==='ทั้งหมด'||i.category===selectedCategory)&&(i.name.toLowerCase().includes(keyword)||i.desc.toLowerCase().includes(keyword)));grid.innerHTML=filtered.map(i=>`<article class="item-card"><div class="item-icon">${i.icon}</div><div><h3>${i.name}</h3><p>${i.desc}</p><div class="tag-row"><span class="tag">${i.tag}</span><button class="add-btn" onclick="addToCart('${i.name}')">เพิ่ม</button></div></div></article>`).join('')||'<p class="empty-cart">ไม่พบรายการที่ค้นหา</p>';}
-    function filterCategory(c,b){selectedCategory=c;document.querySelectorAll('.category-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderItems();}
-    function addToCart(name){const f=cart.find(i=>i.name===name); f?f.qty++:cart.push({name,qty:1}); renderCart(); togglePadSize(); showToast('เพิ่มรายการในตะกร้าแล้ว');}
-    function updateQty(name,amt){const f=cart.find(i=>i.name===name); if(!f)return; f.qty+=amt; if(f.qty<=0)cart=cart.filter(i=>i.name!==name); renderCart();}
-    function renderCart(){const el=document.getElementById('cartList'); if(!cart.length){el.className='empty-cart';el.innerHTML='ยังไม่มีรายการ กรุณาเลือกรายการที่ต้องการขอรับ'; togglePadSize(); return;} el.className=''; el.innerHTML=cart.map(i=>`<div class="cart-item"><span>${i.name}</span><div class="qty-control"><button type="button" onclick="updateQty('${i.name}',-1)">−</button><strong>${i.qty}</strong><button type="button" onclick="updateQty('${i.name}',1)">+</button></div></div>`).join(''); togglePadSize();}
-    function togglePadSize(){const hasPad=cart.some(i=>i.name==='ผ้าอนามัย'); document.getElementById('padSizeSection').classList.toggle('hidden',!hasPad);}
-    function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
-    function saveOrders(){localStorage.setItem('schoolMedicineOrders',JSON.stringify(orders));}
-    document.getElementById('searchInput').addEventListener('input',renderItems); document.getElementById('adminSearch').addEventListener('input',renderOrders);
-    document.getElementById('requestForm').addEventListener('submit',e=>{e.preventDefault(); if(!cart.length){alert('กรุณาเลือกรายการก่อนส่งคำขอ');return;} const hasPad=cart.some(i=>i.name==='ผ้าอนามัย'); if(hasPad && !padSize.value){alert('กรุณาระบุขนาดผ้าอนามัย'); return;} const itemText=cart.map(i=>{if(i.name==='ผ้าอนามัย'){return `${i.name} (${padSize.value}) x ${i.qty}`;} return `${i.name} x ${i.qty}`;}).join(', '); const order={id:Date.now(),time:new Date().toLocaleString('th-TH'),name:studentName.value,room:classRoom.value,type:userType.value,contact:contactInfo.value,items:itemText,reason:reason.value,status:'รอตรวจสอบ'}; orders.unshift(order); saveOrders(); cart=[]; renderCart(); e.target.reset(); document.getElementById('successModal').classList.remove('hidden');});
-    function closeSuccessModal(){document.getElementById('successModal').classList.add('hidden');showPage('student');}
-    function statusClass(s){return s==='รอตรวจสอบ'?'pending':s==='อนุมัติให้รับ'?'approved':s==='รับเรียบร้อย'?'done':'reject';}
-    function renderOrders(){const q=(document.getElementById('adminSearch')?.value||'').toLowerCase(); const rows=orders.filter(o=>(o.name+o.room+o.items+o.reason+o.status).toLowerCase().includes(q)); document.getElementById('ordersTable').innerHTML=rows.map(o=>`<tr><td>${o.time}</td><td><strong>${o.name}</strong><br>${o.type} | ${o.room}</td><td>${o.contact || '-'}</td><td>${o.items}</td><td>${o.reason}</td><td><span class="status ${statusClass(o.status)}">${o.status}</span></td><td><button class="admin-action" onclick="setStatus(${o.id},'อนุมัติให้รับ')">อนุมัติ</button> <button class="admin-action secondary" onclick="setStatus(${o.id},'รับเรียบร้อย')">รับแล้ว</button> <button class="admin-action gray" onclick="setStatus(${o.id},'ไม่อนุมัติ')">ไม่อนุมัติ</button> <button class="admin-action danger" onclick="deleteOrder(${o.id})">ลบ</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty-cart">ยังไม่มีคำขอรับยา</td></tr>'; updateStats();}
-    function updateStats(){document.getElementById('totalCount').textContent=orders.length;document.getElementById('pendingCount').textContent=orders.filter(o=>o.status==='รอตรวจสอบ').length;document.getElementById('approvedCount').textContent=orders.filter(o=>o.status==='อนุมัติให้รับ').length;document.getElementById('doneCount').textContent=orders.filter(o=>o.status==='รับเรียบร้อย').length;}
-    function setStatus(id,status){orders=orders.map(o=>o.id===id?{...o,status}:o);saveOrders();renderOrders();}
-    function deleteOrder(id){if(confirm('ต้องการลบคำขอนี้ใช่หรือไม่?')){orders=orders.filter(o=>o.id!==id);saveOrders();renderOrders();}}
-    function clearOrders(){if(confirm('ต้องการล้างคำขอทั้งหมดใช่หรือไม่?')){orders=[];saveOrders();renderOrders();}}
-    function loadSampleOrders(){orders.unshift({id:Date.now()+1,time:new Date().toLocaleString('th-TH'),name:'นักเรียนตัวอย่าง 1',room:'ม.3/2',type:'นักเรียน',contact:'081-234-5678',items:'ผ้าอนามัย x 1',reason:'มีประจำเดือนระหว่างเรียน',status:'รอตรวจสอบ'},{id:Date.now()+2,time:new Date().toLocaleString('th-TH'),name:'นักเรียนตัวอย่าง 2',room:'ม.5/1',type:'นักเรียน',contact:'student@example.com',items:'พลาสเตอร์ปิดแผล x 1',reason:'หกล้ม มีแผลถลอก',status:'อนุมัติให้รับ'});saveOrders();renderOrders();}
-    renderItems(); renderCart(); renderOrders();
+      if(page === 'admin' && !adminUnlocked){ openPinModal(); return; }
+      document.getElementById('studentPage').classList.toggle('hidden', page !== 'student');
+      document.getElementById('adminPage').classList.toggle('hidden', page !== 'admin');
+      document.getElementById('studentHero').classList.toggle('hidden', page !== 'student');
+      document.getElementById('adminHero').classList.toggle('hidden', page !== 'admin');
+      document.getElementById('studentBtn').classList.toggle('active', page === 'student');
+      document.getElementById('adminBtn').classList.toggle('active', page === 'admin');
+      if(page === 'admin') renderOrders();
+    }
+
+    function openPinModal(){
+      document.getElementById('pinModal').classList.remove('hidden');
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinError').style.display = 'none';
+      setTimeout(() => document.getElementById('pinInput').focus(), 80);
+    }
+
+    function closePinModal(){
+      document.getElementById('pinModal').classList.add('hidden');
+      showPage('student');
+    }
+
+    function checkPin(){
+      const pin = document.getElementById('pinInput').value;
+      if(pin === '6666'){
+        adminUnlocked = true;
+        document.getElementById('pinModal').classList.add('hidden');
+        showPage('admin');
+      } else {
+        document.getElementById('pinError').style.display = 'block';
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Enter' && !document.getElementById('pinModal').classList.contains('hidden')) checkPin();
+    });
+
+    function renderItems(){
+      const grid = document.getElementById('itemsGrid');
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = items.filter(i =>
+        (selectedCategory === 'ทั้งหมด' || i.category === selectedCategory) &&
+        (i.name.toLowerCase().includes(keyword) || i.desc.toLowerCase().includes(keyword))
+      );
+      grid.innerHTML = filtered.map(i => `
+        <article class="item-card">
+          <div class="item-icon">${i.icon}</div>
+          <div>
+            <h3>${i.name}</h3>
+            <p>${i.desc}</p>
+            <div class="tag-row">
+              <span class="tag">${i.tag}</span>
+              <button class="add-btn" onclick="addToCart('${i.name}')">เพิ่ม</button>
+            </div>
+          </div>
+        </article>
+      `).join('') || '<p class="empty-cart">ไม่พบรายการที่ค้นหา</p>';
+    }
+
+    function filterCategory(c,b){
+      selectedCategory = c;
+      document.querySelectorAll('.category-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      renderItems();
+    }
+
+    function addToCart(name){
+      const f = cart.find(i => i.name === name);
+      f ? f.qty++ : cart.push({name, qty:1});
+      renderCart();
+      togglePadSize();
+      showToast('เพิ่มรายการในตะกร้าแล้ว');
+    }
+
+    function updateQty(name, amt){
+      const f = cart.find(i => i.name === name);
+      if(!f) return;
+      f.qty += amt;
+      if(f.qty <= 0) cart = cart.filter(i => i.name !== name);
+      renderCart();
+    }
+
+    function renderCart(){
+      const el = document.getElementById('cartList');
+      if(!cart.length){
+        el.className = 'empty-cart';
+        el.innerHTML = 'ยังไม่มีรายการ กรุณาเลือกรายการที่ต้องการขอรับ';
+        togglePadSize();
+        return;
+      }
+      el.className = '';
+      el.innerHTML = cart.map(i => `
+        <div class="cart-item">
+          <span>${i.name}</span>
+          <div class="qty-control">
+            <button type="button" onclick="updateQty('${i.name}',-1)">−</button>
+            <strong>${i.qty}</strong>
+            <button type="button" onclick="updateQty('${i.name}',1)">+</button>
+          </div>
+        </div>
+      `).join('');
+      togglePadSize();
+    }
+
+    function togglePadSize(){
+      const hasPad = cart.some(i => i.name === 'ผ้าอนามัย');
+      document.getElementById('padSizeSection').classList.toggle('hidden', !hasPad);
+    }
+
+    function showToast(text){
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1600);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderItems);
+    document.getElementById('adminSearch').addEventListener('input', renderOrders);
+
+    ordersRef.on('value', snapshot => {
+      const data = snapshot.val() || {};
+      orders = Object.entries(data).map(([id, value]) => ({ id, ...value }));
+      orders.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      renderOrders();
+    }, error => {
+      alert('เชื่อมต่อ Firebase ไม่สำเร็จ: ' + error.message);
+    });
+
+    document.getElementById('requestForm').addEventListener('submit', e => {
+      e.preventDefault();
+      if(!cart.length){ alert('กรุณาเลือกรายการก่อนส่งคำขอ'); return; }
+      const hasPad = cart.some(i => i.name === 'ผ้าอนามัย');
+      if(hasPad && !padSize.value){ alert('กรุณาระบุขนาดผ้าอนามัย'); return; }
+
+      const itemText = cart.map(i => {
+        if(i.name === 'ผ้าอนามัย') return `${i.name} (${padSize.value}) x ${i.qty}`;
+        return `${i.name} x ${i.qty}`;
+      }).join(', ');
+
+      const order = {
+        createdAt: Date.now(),
+        time: new Date().toLocaleString('th-TH'),
+        name: studentName.value,
+        room: classRoom.value,
+        type: userType.value,
+        contact: contactInfo.value,
+        items: itemText,
+        reason: reason.value,
+        status: 'รอตรวจสอบ'
+      };
+
+      ordersRef.push(order).then(() => {
+        cart = [];
+        renderCart();
+        e.target.reset();
+        document.getElementById('successModal').classList.remove('hidden');
+      }).catch(error => {
+        alert('ส่งคำขอไม่สำเร็จ: ' + error.message);
+      });
+    });
+
+    function closeSuccessModal(){
+      document.getElementById('successModal').classList.add('hidden');
+      showPage('student');
+    }
+
+    function statusClass(s){
+      return s === 'รอตรวจสอบ' ? 'pending' : s === 'อนุมัติให้รับ' ? 'approved' : s === 'รับเรียบร้อย' ? 'done' : 'reject';
+    }
+
+    function renderOrders(){
+      const table = document.getElementById('ordersTable');
+      if(!table) return;
+      const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+      const rows = orders.filter(o => ((o.name||'') + (o.room||'') + (o.contact||'') + (o.items||'') + (o.reason||'') + (o.status||'')).toLowerCase().includes(q));
+
+      table.innerHTML = rows.map(o => `
+        <tr>
+          <td>${o.time || '-'}</td>
+          <td><strong>${o.name || '-'}</strong><br>${o.type || '-'} | ${o.room || '-'}</td>
+          <td>${o.contact || '-'}</td>
+          <td>${o.items || '-'}</td>
+          <td>${o.reason || '-'}</td>
+          <td><span class="status ${statusClass(o.status)}">${o.status || '-'}</span></td>
+          <td>
+            <button class="admin-action" onclick="setStatus('${o.id}','อนุมัติให้รับ')">อนุมัติ</button>
+            <button class="admin-action secondary" onclick="setStatus('${o.id}','รับเรียบร้อย')">รับแล้ว</button>
+            <button class="admin-action gray" onclick="setStatus('${o.id}','ไม่อนุมัติ')">ไม่อนุมัติ</button>
+            <button class="admin-action danger" onclick="deleteOrder('${o.id}')">ลบ</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="7" class="empty-cart">ยังไม่มีคำขอรับยา</td></tr>';
+      updateStats();
+    }
+
+    function updateStats(){
+      document.getElementById('totalCount').textContent = orders.length;
+      document.getElementById('pendingCount').textContent = orders.filter(o => o.status === 'รอตรวจสอบ').length;
+      document.getElementById('approvedCount').textContent = orders.filter(o => o.status === 'อนุมัติให้รับ').length;
+      document.getElementById('doneCount').textContent = orders.filter(o => o.status === 'รับเรียบร้อย').length;
+    }
+
+    function setStatus(id, status){
+      ordersRef.child(id).update({ status });
+    }
+
+    function deleteOrder(id){
+      if(confirm('ต้องการลบคำขอนี้ใช่หรือไม่?')) ordersRef.child(id).remove();
+    }
+
+    function clearOrders(){
+      if(confirm('ต้องการล้างคำขอทั้งหมดใช่หรือไม่?')) ordersRef.remove();
+    }
+
+    function loadSampleOrders(){
+      const sample1 = ordersRef.push();
+      const sample2 = ordersRef.push();
+      const now = Date.now();
+      const updates = {};
+      updates[sample1.key] = {createdAt: now + 1, time:new Date().toLocaleString('th-TH'), name:'นักเรียนตัวอย่าง 1', room:'ม.3/2', type:'นักเรียน', contact:'081-234-5678', items:'ผ้าอนามัย (ขนาดกลาง 24–26 ซม.) x 1', reason:'มีประจำเดือนระหว่างเรียน', status:'รอตรวจสอบ'};
+      updates[sample2.key] = {createdAt: now + 2, time:new Date().toLocaleString('th-TH'), name:'นักเรียนตัวอย่าง 2', room:'ม.5/1', type:'นักเรียน', contact:'student@example.com', items:'พลาสเตอร์ปิดแผล x 1', reason:'หกล้ม มีแผลถลอก', status:'อนุมัติให้รับ'};
+      ordersRef.update(updates);
+    }
+
+    renderItems();
+    renderCart();
+    renderOrders();
   </script>
 </body>
 </html>
