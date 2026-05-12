@@ -40,6 +40,9 @@
     .item-card p { font-size:13px; color:#6b7280; line-height:1.55; min-height:40px; }
     .tag-row { display:flex; justify-content:space-between; align-items:center; margin-top:12px; gap:8px; }
     .tag { font-size:12px; background:#fef3c7; color:#0b3d91; padding:5px 9px; border-radius:999px; }
+    .tag.sale { background:#dcfce7; color:#166534; }
+    .tag.rental { background:#dbeafe; color:#1e40af; }
+    .tag.free { background:#fef3c7; color:#0b3d91; }
     .add-btn,.submit-btn,.admin-action { border:none; background:#1d4ed8; color:white; padding:9px 12px; border-radius:12px; cursor:pointer; font-weight:800; }
     .cart { position:sticky; top:18px; }
     .cart-item { display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid #e5e7eb; padding:12px 0; font-size:14px; }
@@ -64,13 +67,28 @@
     th { background:#0b3d91; color:#fff; }
     .status { display:inline-block; padding:5px 9px; border-radius:999px; font-size:12px; font-weight:800; }
     .pending { background:#fef3c7; color:#92400e; }
-    .approved { background:#fef3c7; color:#166534; }
+    .approved { background:#dcfce7; color:#166534; }
     .done { background:#dbeafe; color:#1e40af; }
     .reject { background:#fee2e2; color:#991b1b; }
     .admin-action.secondary { background:#2563eb; }
     .admin-action.danger { background:#dc2626; }
     .admin-action.gray { background:#6b7280; }
     .admin-toolbar { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .stock-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:18px 0; }
+    .stock-card { border:1px solid #e5e7eb; border-radius:18px; padding:14px; background:#f8fbff; }
+    .stock-card h3 { color:#0b3d91; font-size:16px; margin-bottom:8px; }
+    .stock-count { font-size:24px; font-weight:900; color:#0b3d91; margin-bottom:10px; }
+    .stock-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .stock-actions input,.stock-actions select { margin-top:0; }
+    .stock-manage-box { border:1px solid #bfdbfe; background:#eff6ff; border-radius:22px; padding:16px; margin:18px 0; }
+    .stock-manage-box h3 { color:#0b3d91; margin-bottom:12px; }
+    .stock-manage-row { display:grid; grid-template-columns:1.2fr .7fr auto auto; gap:10px; align-items:end; }
+    .stock-list { margin-top:14px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .stock-mini { background:white; border:1px solid #e5e7eb; border-radius:14px; padding:10px; font-size:13px; }
+    .stock-mini strong { display:block; color:#0b3d91; margin-bottom:4px; }
+    .stock-badge { display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px; background:#dbeafe; color:#1e40af; margin-top:8px; }
+    .stock-badge.out { background:#fee2e2; color:#991b1b; }
+    .add-btn.disabled { background:#9ca3af; cursor:not-allowed; }
     .pin-modal { position:fixed; inset:0; background:rgba(15,23,42,.62); display:grid; place-items:center; padding:18px; z-index:50; }
     .pin-modal.hidden { display:none !important; }
     .pin-card { width:min(420px,100%); background:white; color:#1f2937; border-radius:26px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,.28); }
@@ -85,7 +103,7 @@
     .success-check { width:92px; height:92px; border-radius:50%; background:#fef3c7; color:#ca8a04; display:grid; place-items:center; margin:0 auto 18px; font-size:54px; font-weight:900; }
     .success-card h2 { color:#0b3d91; font-size:30px; margin-bottom:8px; }
     .success-card p { color:#6b7280; line-height:1.7; margin-bottom:18px; }
-    @media (max-width:900px){ .hero,main{grid-template-columns:1fr;} main{margin-top:-34px;} .items-grid,.admin-stats{grid-template-columns:1fr;} .cart{position:static;} .topbar{align-items:flex-start; flex-direction:column;} table{font-size:12px;} th,td{padding:9px;} }
+    @media (max-width:900px){ .hero,main{grid-template-columns:1fr;} main{margin-top:-34px;} .items-grid,.admin-stats,.stock-grid,.stock-list,.stock-manage-row{grid-template-columns:1fr;} .cart{position:static;} .topbar{align-items:flex-start; flex-direction:column;} table{font-size:12px;} th,td{padding:9px;} }
   </style>
 </head>
 <body>
@@ -101,11 +119,11 @@
       </div>
     </div>
     <section class="hero" id="studentHero">
-      <div><h2>ระบบขอรับยาสามัญภายในโรงเรียน</h2><p>นักเรียนสามารถเลือกรายการยาสามัญหรือของใช้จำเป็น ส่งคำขอ และรอเจ้าหน้าที่ห้องพยาบาลตรวจสอบก่อนรับของ เพื่อความปลอดภัยและการใช้ยาอย่างถูกต้อง</p></div>
-      <div class="hero-card"><h3>ขั้นตอนการใช้งาน</h3><ul><li>เลือกรายการที่ต้องการ</li><li>กรอกชื่อ ชั้น/ห้อง และอาการเบื้องต้น</li><li>ส่งคำขอให้เจ้าหน้าที่ตรวจสอบ</li><li>รับยา/ของใช้ที่ห้องพยาบาล</li></ul></div>
+      <div><h2>ระบบขอรับยาสามัญและของใช้จำเป็นภายในโรงเรียน</h2><p>นักเรียนสามารถเลือกรายการยาสามัญหรือของใช้จำเป็น ส่งคำขอ และรอแอดมินตรวจสอบ เพื่อความปลอดภัยและความถูกต้องในการให้บริการ</p></div>
+      <div class="hero-card"><h3>ขั้นตอนการใช้งาน</h3><ul><li>เลือกรายการที่ต้องการ</li><li>กรอกชื่อ ชั้น/ห้อง และอาการเบื้องต้น</li><li>ส่งคำขอให้แอดมินตรวจสอบ</li><li>ใส่เบอร์โทรที่ถูกต้อง แอดมินจะโทรกลับไป</li><li>หากใส่รายละเอียดไม่ครบถ้วน จะไม่อนุมัติคำขอ</li></ul></div>
     </section>
     <section class="hero hidden" id="adminHero">
-      <div><h2>ระบบหลังบ้านแอดมิน<br>จัดการคำขอรับยา</h2><p>สำหรับเจ้าหน้าที่ห้องพยาบาลตรวจสอบคำสั่งขอรับยา เปลี่ยนสถานะคำขอ และติดตามจำนวนรายการที่รอดำเนินการ</p></div>
+      <div><h2>ระบบหลังบ้านแอดมิน<br>จัดการคำขอรับยา</h2><p>สำหรับแอดมินตรวจสอบคำขอ เปลี่ยนสถานะคำขอ และจัดการจำนวนคงเหลือของรายการทั้งหมด</p></div>
       <div class="hero-card"><h3>สถานะคำขอ</h3><ul><li>รอตรวจสอบ</li><li>อนุมัติให้รับ</li><li>รับเรียบร้อย</li><li>ไม่อนุมัติ</li></ul></div>
     </section>
   </header>
@@ -121,13 +139,14 @@
       <form id="requestForm">
         <div><label>ชื่อ-นามสกุล</label><input type="text" id="studentName" placeholder="กรอกชื่อผู้ขอรับ" required></div>
         <div><label>ชั้น/ห้อง</label><input type="text" id="classRoom" placeholder="เช่น ม.3/2" required></div>
-        <div><label>ประเภทผู้ขอ</label><select id="userType" required><option value="">เลือกประเภท</option><option>นักเรียน</option><option>ครู/บุคลากร</option></select></div>
-        <div><label>ช่องทางติดต่อ</label><input type="text" id="contactInfo" placeholder="เช่น เบอร์โทร หรืออีเมล" required></div>
-        <div id="padSizeSection" class="hidden"><label>ขนาดผ้าอนามัย</label><select id="padSize"><option value="">เลือกขนาด</option><option>ขนาดกลาง (24–26 ซม.)</option><option>ขนาดยาว (29–32 ซม.)</option><option>กลางคืน / Overnight</option></select></div>
+        <div><label>เบอร์โทรติดต่อ</label><input type="text" id="contactInfo" placeholder="เบอร์โทร" required></div>
+        <div id="padSizeSection" class="hidden"><label>ขนาดผ้าอนามัย</label><select id="padSize"><option value="">เลือกขนาด</option><option>ขนาดกลาง (24–26 ซม.) - 3 บาท</option><option>ขนาดยาว (29–32 ซม.) - 5 บาท</option></select></div>
+        <div id="paraDoseSection" class="hidden"><label>ขนาดยาพารา</label><select id="paraDose"><option value="">เลือกขนาดยา</option><option>ครึ่งเม็ด</option><option>เต็มเม็ด</option><option>เต็มเม็ด + ครึ่ง</option></select></div>
+        <div id="allergyDoseSection" class="hidden"><label>ขนาดยาแก้แพ้</label><select id="allergyDose"><option value="">เลือกขนาดยา</option><option>ครึ่งเม็ด</option><option>เต็มเม็ด</option><option>เต็มเม็ด + ครึ่ง</option></select></div>
         <div><label>อาการหรือเหตุผลในการขอรับ</label><textarea id="reason" placeholder="เช่น ปวดศีรษะ ปวดท้อง มีประจำเดือน เป็นภูมิแพ้" required></textarea></div>
         <button class="submit-btn" type="submit">ส่งคำขอรับยา</button>
       </form>
-      <div class="warning"><strong>คำเตือน:</strong> รายการยาเป็นเพียงการส่งคำขอเบื้องต้น ต้องได้รับการตรวจสอบจากครู/เจ้าหน้าที่ห้องพยาบาลก่อนทุกครั้ง หากมีอาการรุนแรงควรแจ้งครูทันที</div>
+      <div class="warning"><strong>คำเตือน:</strong> รายการยาเป็นเพียงการส่งคำขอเบื้องต้น ต้องได้รับการตรวจสอบจากแอดมินก่อนทุกครั้ง หากมีอาการรุนแรงควรแจ้งครูทันที</div>
     </aside>
   </main>
 
@@ -141,14 +160,31 @@
         <div class="stat-card">รับเรียบร้อย <strong id="doneCount">0</strong></div>
       </div>
       <div class="admin-toolbar">
-        <button class="admin-action gray" onclick="loadSampleOrders()">เพิ่มข้อมูลตัวอย่าง</button>
+        <button class="admin-action gray" onclick="initDefaultStock()">ตั้งค่าสต็อกเริ่มต้น</button>
         <button class="admin-action danger" onclick="clearOrders()">ล้างคำขอทั้งหมด</button>
       </div>
-      <div style="overflow-x:auto;"><table><thead><tr><th>เวลา</th><th>ผู้ขอ</th><th>ติดต่อ</th><th>รายการ</th><th>เหตุผล</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+      <h2 style="color:#0b3d91; margin:12px 0;">จัดการจำนวนสินค้า</h2>
+      <div class="stock-manage-box">
+        <h3>เลือกสินค้าเพื่อเพิ่ม/ลบจำนวน</h3>
+        <div class="stock-manage-row">
+          <div>
+            <label>เลือกสินค้า</label>
+            <select id="stockSelect"></select>
+          </div>
+          <div>
+            <label>จำนวน</label>
+            <input type="number" id="stockAmount" min="1" value="1">
+          </div>
+          <button class="admin-action" onclick="adjustSelectedStock(1)">เพิ่มจำนวน</button>
+          <button class="admin-action danger" onclick="adjustSelectedStock(-1)">ลบจำนวน</button>
+        </div>
+        <div class="stock-list" id="stockGrid"></div>
+      </div>
+      <div style="overflow-x:auto;"><table><thead><tr><th>เวลา</th><th>ผู้ขอ</th><th>ติดต่อ</th><th>รายการ</th><th>ยอดเงิน</th><th>เหตุผล</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
     </section>
   </main>
 
-  <footer>© โรงเรียนไม้เรียงประชาสรรค์ | ระบบตัวอย่างสำหรับใช้งานภายในโรงเรียน</footer>
+  <footer>© โรงเรียนไม้เรียงประชาสรรค์ | ระบบสำหรับใช้งานภายในโรงเรียน</footer>
   <div class="toast" id="toast">เพิ่มรายการในตะกร้าแล้ว</div>
 
   <div class="success-modal hidden" id="successModal">
@@ -174,37 +210,101 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCWV3QSHFGvD0qPqe-qgDvyPJqBo1bJDVM",
-      authDomain: "planning-with-ai-42dd2.firebaseapp.com",
-      databaseURL: "https://planning-with-ai-42dd2-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "planning-with-ai-42dd2",
-      storageBucket: "planning-with-ai-42dd2.firebasestorage.app",
-      messagingSenderId: "1044229579571",
-      appId: "1:1044229579571:web:bdb7b47615a63259df9446"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    const ordersRef = database.ref('orders');
+    const DB_URL = 'https://planning-with-ai-42dd2-default-rtdb.asia-southeast1.firebasedatabase.app';
 
     const items = [
-      {name:'ผ้าอนามัย',category:'ของใช้จำเป็น',icon:'🌸',desc:'สำหรับนักเรียนหญิงที่มีความจำเป็นเร่งด่วนระหว่างวัน',tag:'รับที่ห้องพยาบาล'},
-      {name:'ยาพาราเซตามอล',category:'ยา',icon:'💊',desc:'ใช้บรรเทาอาการปวดหรือมีไข้ ต้องให้เจ้าหน้าที่พิจารณาก่อนจ่าย',tag:'ต้องตรวจสอบอาการ'},
-      {name:'ยาแก้แพ้',category:'ยา',icon:'🤧',desc:'สำหรับอาการแพ้ คัดจมูก หรือผื่นคันบางกรณี ต้องแจ้งประวัติแพ้ยา',tag:'แจ้งประวัติแพ้ยา'},
-      {name:'ยาธาตุน้ำขาว',category:'ยา',icon:'🧴',desc:'สำหรับอาการแน่นท้อง ท้องอืด หรืออาหารไม่ย่อยเบื้องต้น',tag:'อาการทางท้อง'},
-      {name:'พลาสเตอร์ปิดแผล',category:'ปฐมพยาบาล',icon:'🩹',desc:'สำหรับแผลเล็ก รอยถลอก หรือบาดแผลที่ไม่รุนแรง',tag:'แผลเล็ก'},
-      {name:'สำลี/ผ้าก๊อซ',category:'ปฐมพยาบาล',icon:'🏥',desc:'สำหรับทำแผลเบื้องต้น โดยควรให้เจ้าหน้าที่ช่วยดูแล',tag:'ทำแผล'}
+      {name:'ผ้าอนามัย',category:'ของใช้จำเป็น',icon:'🌸',desc:'จำหน่ายสำหรับนักเรียนหญิงที่มีความจำเป็นเร่งด่วนระหว่างวัน',tag:'3–5 บาท'},
+      {name:'ยาพารา',category:'ยา',icon:'💊',desc:'ใช้บรรเทาอาการปวดหรือมีไข้ ต้องให้แอดมินพิจารณาก่อนจ่าย',tag:'Free'},
+      {name:'ยาแก้แพ้',category:'ยา',icon:'🤧',desc:'สำหรับอาการแพ้ คัดจมูก หรือผื่นคันบางกรณี ต้องแจ้งประวัติแพ้ยา',tag:'Free'},
+      {name:'ยาธาตุน้ำขาว',category:'ยา',icon:'🧴',desc:'สำหรับอาการแน่นท้อง ท้องอืด หรืออาหารไม่ย่อยเบื้องต้น',tag:'Free'},
+      {name:'พลาสเตอร์ปิดแผล',category:'ปฐมพยาบาล',icon:'🩹',desc:'สำหรับแผลเล็ก รอยถลอก หรือบาดแผลที่ไม่รุนแรง',tag:'Free'},
+      {name:'เสื้อกันฝน',category:'ของใช้จำเป็น',icon:'🧥',desc:'จำหน่ายสำหรับใช้ในกรณีฝนตกหรือเหตุจำเป็นระหว่างวัน',tag:'15 บาท'},
+      {name:'เช่าร่ม',category:'ของใช้จำเป็น',icon:'☂️',desc:'ให้เช่าใช้งานชั่วคราวในวันที่ฝนตก',tag:'10 บาท/วัน'}
     ];
+
+    const itemLimits = {
+      'ผ้าอนามัย': 10,
+      'ยาธาตุน้ำขาว': 1,
+      'ยาพารา': 2,
+      'ยาแก้แพ้': 2,
+      'พลาสเตอร์ปิดแผล': 10
+    };
+
+    const defaultStock = {
+      'ผ้าอนามัย': 20,
+      'ยาพารา': 30,
+      'ยาแก้แพ้': 20,
+      'ยาธาตุน้ำขาว': 15,
+      'พลาสเตอร์ปิดแผล': 50,
+      'เสื้อกันฝน': 10,
+      'เช่าร่ม': 5
+    };
 
     let selectedCategory = 'ทั้งหมด';
     let cart = [];
     let orders = [];
+    let stock = {};
     let adminUnlocked = false;
+    let isSubmitting = false;
+
+    async function dbGet(path){
+      const res = await fetch(`${DB_URL}/${path}.json`);
+      if(!res.ok) throw new Error(`GET ${path} failed`);
+      return await res.json();
+    }
+
+    async function dbPut(path, data){
+      const res = await fetch(`${DB_URL}/${path}.json`, {
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(data)
+      });
+      if(!res.ok) throw new Error(`PUT ${path} failed`);
+      return await res.json();
+    }
+
+    async function dbPatch(path, data){
+      const res = await fetch(`${DB_URL}/${path}.json`, {
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(data)
+      });
+      if(!res.ok) throw new Error(`PATCH ${path} failed`);
+      return await res.json();
+    }
+
+    async function dbDelete(path){
+      const res = await fetch(`${DB_URL}/${path}.json`, { method:'DELETE' });
+      if(!res.ok) throw new Error(`DELETE ${path} failed`);
+      return await res.json();
+    }
+
+    async function loadOrders(){
+      try{
+        const data = await dbGet('orders');
+        orders = Object.entries(data || {}).map(([id, value]) => ({ id, ...value }));
+        orders.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+        renderOrders();
+      }catch(error){
+        console.error(error);
+        showToast('โหลดคำขอไม่สำเร็จ');
+      }
+    }
+
+    async function loadStock(){
+      try{
+        const data = await dbGet('stock');
+        stock = data || {};
+        renderItems();
+        renderStockAdmin();
+      }catch(error){
+        console.error(error);
+        stock = stock || {};
+        renderItems();
+        renderStockAdmin();
+      }
+    }
 
     function showPage(page){
       if(page === 'admin' && !adminUnlocked){ openPinModal(); return; }
@@ -214,7 +314,7 @@
       document.getElementById('adminHero').classList.toggle('hidden', page !== 'admin');
       document.getElementById('studentBtn').classList.toggle('active', page === 'student');
       document.getElementById('adminBtn').classList.toggle('active', page === 'admin');
-      if(page === 'admin') renderOrders();
+      if(page === 'admin') { loadOrders(); loadStock(); }
     }
 
     function openPinModal(){
@@ -231,7 +331,7 @@
 
     function checkPin(){
       const pin = document.getElementById('pinInput').value;
-      if(pin === '6666'){
+      if(pin === '1515'){
         adminUnlocked = true;
         document.getElementById('pinModal').classList.add('hidden');
         showPage('admin');
@@ -246,26 +346,49 @@
       if(e.key === 'Enter' && !document.getElementById('pinModal').classList.contains('hidden')) checkPin();
     });
 
+    function tagClass(tag){
+      if(['3–5 บาท','15 บาท'].includes(tag)) return 'sale';
+      if(tag === '10 บาท/วัน') return 'rental';
+      if(tag === 'Free') return 'free';
+      return '';
+    }
+
+    function getStock(name){
+      return Number(stock[name] ?? 0);
+    }
+
+    function cartQty(name){
+      const found = cart.find(i => i.name === name);
+      return found ? found.qty : 0;
+    }
+
     function renderItems(){
       const grid = document.getElementById('itemsGrid');
+      if(!grid) return;
       const keyword = document.getElementById('searchInput').value.toLowerCase();
       const filtered = items.filter(i =>
         (selectedCategory === 'ทั้งหมด' || i.category === selectedCategory) &&
         (i.name.toLowerCase().includes(keyword) || i.desc.toLowerCase().includes(keyword))
       );
-      grid.innerHTML = filtered.map(i => `
-        <article class="item-card">
-          <div class="item-icon">${i.icon}</div>
-          <div>
-            <h3>${i.name}</h3>
-            <p>${i.desc}</p>
-            <div class="tag-row">
-              <span class="tag">${i.tag}</span>
-              <button class="add-btn" onclick="addToCart('${i.name}')">เพิ่ม</button>
+
+      grid.innerHTML = filtered.map(i => {
+        const remain = getStock(i.name);
+        const out = remain <= 0;
+        return `
+          <article class="item-card">
+            <div class="item-icon">${i.icon}</div>
+            <div>
+              <h3>${i.name}</h3>
+              <p>${i.desc}</p>
+              <span class="stock-badge ${out ? 'out' : ''}">${out ? 'หมดแล้ว' : 'คงเหลือ ' + remain + ' ชิ้น'}</span>
+              <div class="tag-row">
+                <span class="tag ${tagClass(i.tag)}">${i.tag}</span>
+                <button class="add-btn ${out ? 'disabled' : ''}" ${out ? 'disabled' : ''} onclick="addToCart('${i.name}')">${out ? 'หมด' : 'เพิ่ม'}</button>
+              </div>
             </div>
-          </div>
-        </article>
-      `).join('') || '<p class="empty-cart">ไม่พบรายการที่ค้นหา</p>';
+          </article>
+        `;
+      }).join('') || '<p class="empty-cart">ไม่พบรายการที่ค้นหา</p>';
     }
 
     function filterCategory(c,b){
@@ -276,17 +399,39 @@
     }
 
     function addToCart(name){
+      const remain = getStock(name);
+      if(remain <= 0){ showToast(`${name} หมดแล้ว`); return; }
+      if(cartQty(name) >= remain){ showToast(`${name} มีคงเหลือ ${remain} ชิ้น`); return; }
+
       const f = cart.find(i => i.name === name);
-      f ? f.qty++ : cart.push({name, qty:1});
+      const limit = Math.min(itemLimits[name] || 99, remain);
+
+      if(f){
+        if(f.qty >= limit){
+          showToast(`จำกัด ${name} สูงสุด ${limit} ชิ้น`);
+          return;
+        }
+        f.qty++;
+      } else {
+        cart.push({name, qty:1});
+      }
       renderCart();
-      togglePadSize();
       showToast('เพิ่มรายการในตะกร้าแล้ว');
     }
 
     function updateQty(name, amt){
+      const remain = getStock(name);
       const f = cart.find(i => i.name === name);
       if(!f) return;
-      f.qty += amt;
+      const limit = Math.min(itemLimits[name] || 99, remain);
+      const newQty = f.qty + amt;
+
+      if(newQty > limit){
+        showToast(`จำกัด ${name} สูงสุด ${limit} ชิ้น`);
+        return;
+      }
+
+      f.qty = newQty;
       if(f.qty <= 0) cart = cart.filter(i => i.name !== name);
       renderCart();
     }
@@ -296,7 +441,7 @@
       if(!cart.length){
         el.className = 'empty-cart';
         el.innerHTML = 'ยังไม่มีรายการ กรุณาเลือกรายการที่ต้องการขอรับ';
-        togglePadSize();
+        toggleItemOptions();
         return;
       }
       el.className = '';
@@ -310,12 +455,16 @@
           </div>
         </div>
       `).join('');
-      togglePadSize();
+      toggleItemOptions();
     }
 
-    function togglePadSize(){
+    function toggleItemOptions(){
       const hasPad = cart.some(i => i.name === 'ผ้าอนามัย');
+      const hasPara = cart.some(i => i.name === 'ยาพารา');
+      const hasAllergy = cart.some(i => i.name === 'ยาแก้แพ้');
       document.getElementById('padSizeSection').classList.toggle('hidden', !hasPad);
+      document.getElementById('paraDoseSection').classList.toggle('hidden', !hasPara);
+      document.getElementById('allergyDoseSection').classList.toggle('hidden', !hasAllergy);
     }
 
     function showToast(text){
@@ -328,46 +477,71 @@
     document.getElementById('searchInput').addEventListener('input', renderItems);
     document.getElementById('adminSearch').addEventListener('input', renderOrders);
 
-    ordersRef.on('value', snapshot => {
-      const data = snapshot.val() || {};
-      orders = Object.entries(data).map(([id, value]) => ({ id, ...value }));
-      orders.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-      renderOrders();
-    }, error => {
-      alert('เชื่อมต่อ Firebase ไม่สำเร็จ: ' + error.message);
-    });
-
-    document.getElementById('requestForm').addEventListener('submit', e => {
+    document.getElementById('requestForm').addEventListener('submit', async e => {
       e.preventDefault();
+      if(isSubmitting) return;
       if(!cart.length){ alert('กรุณาเลือกรายการก่อนส่งคำขอ'); return; }
+
+      await loadStock();
+      for(const i of cart){
+        if(i.qty > getStock(i.name)){
+          alert(`${i.name} มีคงเหลือไม่พอ กรุณาลดจำนวน`);
+          return;
+        }
+      }
+
       const hasPad = cart.some(i => i.name === 'ผ้าอนามัย');
       if(hasPad && !padSize.value){ alert('กรุณาระบุขนาดผ้าอนามัย'); return; }
+      const hasPara = cart.some(i => i.name === 'ยาพารา');
+      if(hasPara && !paraDose.value){ alert('กรุณาเลือกขนาดยาพารา'); return; }
+      const hasAllergy = cart.some(i => i.name === 'ยาแก้แพ้');
+      if(hasAllergy && !allergyDose.value){ alert('กรุณาเลือกขนาดยาแก้แพ้'); return; }
 
       const itemText = cart.map(i => {
         if(i.name === 'ผ้าอนามัย') return `${i.name} (${padSize.value}) x ${i.qty}`;
+        if(i.name === 'ยาพารา') return `${i.name} (${paraDose.value}) x ${i.qty}`;
+        if(i.name === 'ยาแก้แพ้') return `${i.name} (${allergyDose.value}) x ${i.qty}`;
         return `${i.name} x ${i.qty}`;
       }).join(', ');
 
+      let totalPrice = 0;
+      cart.forEach(i => {
+        if(i.name === 'ผ้าอนามัย') totalPrice += padSize.value.includes('ยาว') ? 5 * i.qty : 3 * i.qty;
+        if(i.name === 'เสื้อกันฝน') totalPrice += 15 * i.qty;
+        if(i.name === 'เช่าร่ม') totalPrice += 10 * i.qty;
+      });
+
+      const id = `order_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
       const order = {
         createdAt: Date.now(),
         time: new Date().toLocaleString('th-TH'),
-        name: studentName.value,
-        room: classRoom.value,
-        type: userType.value,
-        contact: contactInfo.value,
+        name: studentName.value.trim(),
+        room: classRoom.value.trim(),
+        contact: contactInfo.value.trim(),
         items: itemText,
-        reason: reason.value,
-        status: 'รอตรวจสอบ'
+        reason: reason.value.trim(),
+        status: 'รอตรวจสอบ',
+        totalPrice: totalPrice
       };
 
-      ordersRef.push(order).then(() => {
+      try{
+        isSubmitting = true;
+        await dbPut(`orders/${id}`, order);
+        for(const i of cart){
+          await dbPut(`stock/${encodeURIComponent(i.name)}`, Math.max(0, getStock(i.name) - i.qty));
+        }
         cart = [];
         renderCart();
         e.target.reset();
+        await loadOrders();
+        await loadStock();
         document.getElementById('successModal').classList.remove('hidden');
-      }).catch(error => {
-        alert('ส่งคำขอไม่สำเร็จ: ' + error.message);
-      });
+      }catch(error){
+        console.error(error);
+        alert('ส่งคำขอไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+      }finally{
+        isSubmitting = false;
+      }
     });
 
     function closeSuccessModal(){
@@ -376,7 +550,10 @@
     }
 
     function statusClass(s){
-      return s === 'รอตรวจสอบ' ? 'pending' : s === 'อนุมัติให้รับ' ? 'approved' : s === 'รับเรียบร้อย' ? 'done' : 'reject';
+      if(s === 'รอตรวจสอบ') return 'pending';
+      if(s === 'อนุมัติให้รับ') return 'approved';
+      if(s === 'รับเรียบร้อย') return 'done';
+      return 'reject';
     }
 
     function renderOrders(){
@@ -388,9 +565,10 @@
       table.innerHTML = rows.map(o => `
         <tr>
           <td>${o.time || '-'}</td>
-          <td><strong>${o.name || '-'}</strong><br>${o.type || '-'} | ${o.room || '-'}</td>
+          <td><strong>${o.name || '-'}</strong><br>${o.room || '-'}</td>
           <td>${o.contact || '-'}</td>
           <td>${o.items || '-'}</td>
+          <td>${Number(o.totalPrice || 0) > 0 ? o.totalPrice + ' บาท' : 'Free'}</td>
           <td>${o.reason || '-'}</td>
           <td><span class="status ${statusClass(o.status)}">${o.status || '-'}</span></td>
           <td>
@@ -400,7 +578,7 @@
             <button class="admin-action danger" onclick="deleteOrder('${o.id}')">ลบ</button>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="7" class="empty-cart">ยังไม่มีคำขอรับยา</td></tr>';
+      `).join('') || '<tr><td colspan="8" class="empty-cart">ยังไม่มีคำขอรับยา</td></tr>';
       updateStats();
     }
 
@@ -411,31 +589,117 @@
       document.getElementById('doneCount').textContent = orders.filter(o => o.status === 'รับเรียบร้อย').length;
     }
 
-    function setStatus(id, status){
-      ordersRef.child(id).update({ status });
+    async function setStatus(id, status){
+      try{
+        await dbPatch(`orders/${id}`, { status });
+        await loadOrders();
+      }catch(error){
+        console.error(error);
+        alert('เปลี่ยนสถานะไม่สำเร็จ');
+      }
     }
 
-    function deleteOrder(id){
-      if(confirm('ต้องการลบคำขอนี้ใช่หรือไม่?')) ordersRef.child(id).remove();
+    async function deleteOrder(id){
+      if(!confirm('ต้องการลบคำขอนี้ใช่หรือไม่?')) return;
+      try{
+        await dbDelete(`orders/${id}`);
+        await loadOrders();
+      }catch(error){
+        console.error(error);
+        alert('ลบคำขอไม่สำเร็จ');
+      }
     }
 
-    function clearOrders(){
-      if(confirm('ต้องการล้างคำขอทั้งหมดใช่หรือไม่?')) ordersRef.remove();
+    async function clearOrders(){
+      if(!confirm('ต้องการล้างคำขอทั้งหมดใช่หรือไม่?')) return;
+      try{
+        await dbDelete('orders');
+        await loadOrders();
+      }catch(error){
+        console.error(error);
+        alert('ล้างคำขอไม่สำเร็จ');
+      }
     }
 
-    function loadSampleOrders(){
-      const sample1 = ordersRef.push();
-      const sample2 = ordersRef.push();
-      const now = Date.now();
-      const updates = {};
-      updates[sample1.key] = {createdAt: now + 1, time:new Date().toLocaleString('th-TH'), name:'นักเรียนตัวอย่าง 1', room:'ม.3/2', type:'นักเรียน', contact:'081-234-5678', items:'ผ้าอนามัย (ขนาดกลาง 24–26 ซม.) x 1', reason:'มีประจำเดือนระหว่างเรียน', status:'รอตรวจสอบ'};
-      updates[sample2.key] = {createdAt: now + 2, time:new Date().toLocaleString('th-TH'), name:'นักเรียนตัวอย่าง 2', room:'ม.5/1', type:'นักเรียน', contact:'student@example.com', items:'พลาสเตอร์ปิดแผล x 1', reason:'หกล้ม มีแผลถลอก', status:'อนุมัติให้รับ'};
-      ordersRef.update(updates);
+    async function initDefaultStock(){
+      if(!confirm('ต้องการตั้งค่าสต็อกเริ่มต้นใช่หรือไม่? ระบบจะเขียนทับจำนวนเดิม')) return;
+      try{
+        await dbPut('stock', defaultStock);
+        await loadStock();
+      }catch(error){
+        console.error(error);
+        alert('ตั้งค่าสต็อกไม่สำเร็จ');
+      }
     }
 
-    renderItems();
-    renderCart();
-    renderOrders();
+    function renderStockAdmin(){
+      const select = document.getElementById('stockSelect');
+      const grid = document.getElementById('stockGrid');
+      if(!select || !grid) return;
+
+      const currentValue = select.value;
+      select.innerHTML = items.map(i => `<option value="${i.name}">${i.icon} ${i.name}</option>`).join('');
+      if(currentValue && items.some(i => i.name === currentValue)) select.value = currentValue;
+
+      grid.innerHTML = items.map(i => {
+        const remain = getStock(i.name);
+        return `
+          <div class="stock-mini">
+            <strong>${i.icon} ${i.name}</strong>
+            คงเหลือ ${remain} ชิ้น
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function adjustSelectedStock(direction){
+      const select = document.getElementById('stockSelect');
+      const amountInput = document.getElementById('stockAmount');
+      const name = select.value;
+      const amount = Math.max(1, Number(amountInput.value || 1));
+      const current = getStock(name);
+      const next = Math.max(0, current + (direction * amount));
+      try{
+        await dbPut(`stock/${encodeURIComponent(name)}`, next);
+        await loadStock();
+        showToast(`${direction > 0 ? 'เพิ่ม' : 'ลบ'} ${name} จำนวน ${amount} ชิ้นแล้ว`);
+      }catch(error){
+        console.error(error);
+        alert('ปรับจำนวนสินค้าไม่สำเร็จ');
+      }
+    }
+
+    function runSmokeTests(){
+      console.assert(Array.isArray(items) && items.length === 7, 'Test failed: items should contain 7 records');
+      console.assert(tagClass('3–5 บาท') === 'sale', 'Test failed: sale tag class');
+      console.assert(tagClass('10 บาท/วัน') === 'rental', 'Test failed: rental tag class');
+      console.assert(tagClass('Free') === 'free', 'Test failed: free tag class');
+      console.assert(statusClass('รอตรวจสอบ') === 'pending', 'Test failed: pending status class');
+      console.assert(statusClass('อนุมัติให้รับ') === 'approved', 'Test failed: approved status class');
+      console.assert(statusClass('รับเรียบร้อย') === 'done', 'Test failed: done status class');
+      console.assert(itemLimits['ยาพารา'] === 2 && itemLimits['ยาแก้แพ้'] === 2, 'Test failed: medicine limit should be 2');
+      console.assert(defaultStock['เช่าร่ม'] === 5, 'Test failed: default umbrella stock should be 5');
+      console.assert(typeof dbGet === 'function' && typeof dbPut === 'function', 'Test failed: database helpers should exist');
+      console.log('Smoke tests passed');
+    }
+
+    async function startApp(){
+      renderItems();
+      renderCart();
+      renderOrders();
+      renderStockAdmin();
+      runSmokeTests();
+      await loadStock();
+      await loadOrders();
+      setInterval(loadStock, 5000);
+      setInterval(loadOrders, 5000);
+    }
+
+    window.addEventListener('error', event => {
+      console.error('Captured error:', event.message, event.error);
+    });
+
+    startApp();
   </script>
 </body>
 </html>
