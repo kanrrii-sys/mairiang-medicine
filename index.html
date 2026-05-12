@@ -527,6 +527,32 @@
       try{
         isSubmitting = true;
         await dbPut(`orders/${id}`, order);
+        await dbPut(`orders/${id}`, order);
+
+// แจ้งเตือน Discord
+fetch('https://discord.com/api/webhooks/1503733439193677914/vNYiTccDSygQqS6ED0lkRLZsEsKA0g0iPlVrSeBNw2i39Pls_MtdT6ODAND5QRsISQms', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    content:
+`📢 มีคำขอใหม่ในระบบเบิกยา
+
+👤 ชื่อ: ${order.name}
+🏫 ห้อง: ${order.room}
+📞 เบอร์โทร: ${order.contact}
+📦 รายการ: ${order.items}
+💰 ยอดเงิน: ${order.totalPrice > 0 ? order.totalPrice + ' บาท' : 'Free'}
+📝 อาการ: ${order.reason}`
+  })
+})
+.then(() => {
+  console.log('Discord ส่งสำเร็จ');
+})
+.catch(err => {
+  console.error('Discord Error:', err);
+});
         for(const i of cart){
           await dbPut(`stock/${encodeURIComponent(i.name)}`, Math.max(0, getStock(i.name) - i.qty));
         }
